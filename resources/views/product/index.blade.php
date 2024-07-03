@@ -27,6 +27,7 @@
                 </div>
             </div>
         </form>
+
         <div class="row">
             <div class="col-md-12">
                 <table class="table">
@@ -48,8 +49,8 @@
                             <tr>
                                 <td>{{ $product->id }}</td>
                                 <td>
-                                    @if($product->img_path)
-                                        <img src="{{ $product->img_path }}" alt="商品画像" style="max-width: 100px;">
+                                    @if($product->image)
+                                        <img src="{{ asset('storage/' . $product->image) }}" alt="商品画像" style="max-width: 100px;">
                                     @else
                                         No Image
                                     @endif
@@ -58,6 +59,16 @@
                                 <td>{{ $product->price }}</td>
                                 <td>{{ $product->stock }}</td>
                                 <td>{{ $product->company->company_name }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ route('products.show', $product->id) }}" class="btn btn-info" style="margin-right: 10px;">詳細</a>
+                                        <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger" onclick="return confirm('本当に削除しますか？')">削除</button>
+                                        </form>
+                                    </div>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
