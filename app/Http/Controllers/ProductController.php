@@ -96,8 +96,8 @@ class ProductController extends Controller
         $product->comment = $request->input('comment');
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('images', 'public');
-            $product->image = $imagePath;
+            $path = $request->file('image')->store('images', 'public');
+            $product->img_path = $path;
         }
 
         $product->save();

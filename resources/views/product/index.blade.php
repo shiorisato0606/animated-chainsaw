@@ -49,8 +49,8 @@
                             <tr>
                                 <td>{{ $product->id }}</td>
                                 <td>
-                                    @if($product->image)
-                                        <img src="{{ asset('storage/' . $product->image) }}" alt="商品画像" style="max-width: 100px;">
+                                    @if($product->img_path)
+                                        <img src="{{ asset('storage/' . $product->img_path) }}" alt="{{ $product->product_name }}" style="max-width: 100px; height: auto;">
                                     @else
                                         No Image
                                     @endif

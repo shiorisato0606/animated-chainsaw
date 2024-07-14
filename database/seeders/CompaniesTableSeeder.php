@@ -32,21 +32,18 @@ class CompaniesTableSeeder extends Seeder
                 'price' => 1000,
                 'stock' => 100,
                 'company_id' => $cocacola->id,
-                'img_path' => 'images/dummy_cola.jpg',
             ],
             [
                 'product_name' => 'ソーダ',
                 'price' => 1000,
                 'stock' => 100,
                 'company_id' => $suntory->id,
-                'img_path' => 'images/dummy_soda.jpg',
             ],
             [
                 'product_name' => '水',
                 'price' => 1000,
                 'stock' => 100,
                 'company_id' => $kirin->id,
-                'img_path' => 'images/dummy_water.jpg',
             ],
         ];
 
