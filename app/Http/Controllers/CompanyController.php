@@ -1,72 +1,118 @@
-@extends('layouts.app')
+<?php
 
-@section('content')
-    <div class="container">
-        <h2>商品情報一覧</h2>
-        <form action="{{ route('products.index') }}" method="GET" class="mb-3">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <input type="text" name="search" id="keyword" class="form-control" placeholder="検索キーワード" value="{{ request('search') }}">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <select name="company" id="company" class="form-control">
-                                <option value="">メーカー名</option>
-                                @foreach($companies as $company)
-                                    <option value="{{ $company->id }}" {{ request('company') == $company->id ? 'selected' : '' }}>{{ $company->company_name }}</option>
-                                @endforeach
-                            </select>
-                            <div class="input-group-append">
-                                <button type="submit" class="btn btn-primary">検索</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
+namespace App\Http\Controllers;
 
-        <div class="row mb-3">
-            <div class="col-md-12 text-right">
-                <a href="{{ route('products.create') }}" class="btn btn-success">新規登録</a>
-            </div>
-        </div>
+use App\Models\Company;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
-        <div class="row">
-            <div class="col-md-12">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>商品画像</th>
-                            <th>商品名</th>
-                            <th>価格</th>
-                            <th>在庫数</th>
-                            <th>メーカー名</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($products as $product)
-                            <tr>
-                                <td>{{ $product->id }}</td>
-                                <td>
-                                    @if($product->img_path)
-                                        <img src="{{ $product->img_path }}" alt="商品画像" style="max-width: 100px;">
-                                    @else
-                                        No Image
-                                    @endif
-                                </td>
-                                <td>{{ $product->product_name }}</td>
-                                <td>{{ $product->price }}</td>
-                                <td>{{ $product->stock }}</td>
-                                <td>{{ $product->company->company_name }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-@endsection
+class CompanyController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('auth'); // 認証が必要な場合、全てのメソッドに適用されるミドルウェア
+    }
+
+    // 会社一覧表示
+    public function index()
+    {
+        $companies = Company::all();
+        return view('company.index', compact('companies'));
+    }
+
+    // 会社詳細表示
+    public function show($id)
+    {
+        $company = Company::findOrFail($id);
+        return view('company.show', compact('company'));
+    }
+
+    // 会社登録ページ表示
+    public function create()
+    {
+        return view('company.create');
+    }
+
+    // 会社登録処理
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'nullable|string|max:255',
+            'representative' => 'nullable|string|max:255',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $company = new Company([
+                'name' => $request->name,
+                'address' => $request->address,
+                'representative' => $request->representative,
+            ]);
+
+            $company->save();
+
+            DB::commit();
+
+            return redirect()->route('companies.index')->with('success', '会社情報を登録しました。');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->withErrors(['error' => '会社情報の登録中にエラーが発生しました。']);
+        }
+    }
+
+    // 会社編集ページ表示
+    public function edit($id)
+    {
+        $company = Company::findOrFail($id);
+        return view('company.edit', compact('company'));
+    }
+
+    // 会社更新処理
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'nullable|string|max:255',
+            'representative' => 'nullable|string|max:255',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $company = Company::findOrFail($id);
+
+            $company->name = $request->name;
+            $company->address = $request->address;
+            $company->representative = $request->representative;
+
+            $company->save();
+
+            DB::commit();
+
+            return redirect()->route('companies.show', ['company' => $company->id])->with('success', '会社情報を更新しました。');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->withErrors(['error' => '会社情報の更新中にエラーが発生しました。']);
+        }
+    }
+
+    // 会社削除処理
+    public function destroy($id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $company = Company::findOrFail($id);
+            $company->delete();
+
+            DB::commit();
+
+            return redirect()->route('companies.index')->with('success', '会社情報を削除しました。');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => '会社情報の削除中にエラーが発生しました。']);
+        }
+    }
+}

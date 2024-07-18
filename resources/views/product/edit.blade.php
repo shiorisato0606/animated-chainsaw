@@ -93,9 +93,9 @@
                                     </span>
                                 @enderror
 
-                                @if ($product->image)
+                                @if ($product->img_path)
                                     <div class="mt-2">
-                                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->product_name }}" style="max-width: 100%; height: auto;">
+                                        <img src="{{ asset('storage/' . $product->img_path) }}" alt="{{ $product->product_name }}" style="max-width: 100%; height: auto;">
                                     </div>
                                 @endif
                             </div>
@@ -106,8 +106,8 @@
                                 <button type="submit" class="btn btn-primary">
                                     更新する
                                 </button>
-                                <a href="{{ route('products.show', ['product' => $product->id]) }}" class="btn btn-secondary">
-                                    戻る
+                                <a href="{{ route('products.show', ['id' => $product->id]) }}" class="btn btn-secondary">
+                                 戻る
                                 </a>
                             </div>
                         </div>

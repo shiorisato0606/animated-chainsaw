@@ -90,10 +90,10 @@
         </div>
 
         <div class="buttons">
-            @if(isset($product))
-            <a href="{{ route('products.edit', ['product' => $product->id]) }}">編集</a>
+        @if(isset($product))
+    <a href="{{ route('products.edit', ['id' => $product->id]) }}">編集</a>
+@endif
 
-            @endif
             <a href="{{ route('products.index') }}">戻る</a>
         </div>
     </div>
