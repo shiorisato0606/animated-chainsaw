@@ -15,9 +15,11 @@
                     <div class="input-group">
                         <select name="company" id="company" class="form-control">
                             <option value="">メーカー名</option>
-                            @foreach($companies as $company)
+                            @forelse($companies as $company)
                                 <option value="{{ $company->id }}" {{ request('company') == $company->id ? 'selected' : '' }}>{{ $company->company_name }}</option>
-                            @endforeach
+                            @empty
+                                <option value="">No companies available</option>
+                            @endforelse
                         </select>
                         <div class="input-group-append">
                             <button type="submit" class="btn btn-primary">検索</button>
@@ -27,7 +29,7 @@
             </div>
         </div>
     </form>
-
+    <!-- 商品一覧の表示部分を追加 -->
     <table class="table table-striped">
         <thead>
             <tr>
@@ -35,12 +37,12 @@
                 <th>商品名</th>
                 <th>価格</th>
                 <th>在庫</th>
-                <th>メーカー名</th>
+                <th>メーカー</th>
                 <th>操作</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($products as $product)
+            @forelse($products as $product)
                 <tr>
                     <td>{{ $product->id }}</td>
                     <td>{{ $product->product_name }}</td>
@@ -50,14 +52,18 @@
                     <td>
                         <a href="{{ route('products.show', $product->id) }}" class="btn btn-info">詳細</a>
                         <a href="{{ route('products.edit', $product->id) }}" class="btn btn-warning">編集</a>
-                        <form action="{{ route('products.destroy', $product->id) }}" method="POST" style="display:inline-block;">
+                        <form action="{{ route('products.destroy', $product->id) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger">削除</button>
                         </form>
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="6">商品が見つかりませんでした</td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
 </div>

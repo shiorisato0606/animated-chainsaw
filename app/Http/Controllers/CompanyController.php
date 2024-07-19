@@ -1,10 +1,11 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\CompanyCreateRequest;
+use App\Http\Requests\CompanyUpdateRequest;
 
 class CompanyController extends Controller
 {
@@ -34,14 +35,8 @@ class CompanyController extends Controller
     }
 
     // 会社登録処理
-    public function store(Request $request)
+    public function store(CompanyCreateRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'address' => 'nullable|string|max:255',
-            'representative' => 'nullable|string|max:255',
-        ]);
-
         try {
             DB::beginTransaction();
 
@@ -70,14 +65,8 @@ class CompanyController extends Controller
     }
 
     // 会社更新処理
-    public function update(Request $request, $id)
+    public function update(CompanyUpdateRequest $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'address' => 'nullable|string|max:255',
-            'representative' => 'nullable|string|max:255',
-        ]);
-
         try {
             DB::beginTransaction();
 

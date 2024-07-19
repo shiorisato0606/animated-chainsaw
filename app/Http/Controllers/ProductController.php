@@ -24,11 +24,13 @@ class ProductController extends Controller
                 $query->where('product_name', 'like', '%' . $request->search . '%');
             })
             ->get();
-
-        $companies = Company::all(); // companies を取得する
-
-        return view('product.index', compact('products', 'companies')); // companies もビューに渡す
+            dd(compact('products', 'companies'));
+        $companies = Company::all(); // 会社のリストを取得する
+    
+        return view('product.index', compact('products','companies')); // companies もビューに渡す
     }
+    
+
 
     // 商品詳細表示
     public function show($id)
