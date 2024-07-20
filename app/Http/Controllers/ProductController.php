@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Product;
@@ -18,19 +19,22 @@ class ProductController extends Controller
     // 商品一覧表示
     public function index(Request $request)
     {
-        $products = Product::query()
-            ->with('company')
-            ->when($request->filled('search'), function ($query) use ($request) {
-                $query->where('product_name', 'like', '%' . $request->search . '%');
+        $search = $request->input('search');
+        $company = $request->input('company');
+        
+        $products = Product::with('company')
+            ->when($search, function($query, $search) {
+                return $query->where('product_name', 'like', "%{$search}%");
+            })
+            ->when($company, function($query, $company) {
+                return $query->where('company_id', $company);
             })
             ->get();
-            dd(compact('products', 'companies'));
-        $companies = Company::all(); // 会社のリストを取得する
-    
-        return view('product.index', compact('products','companies')); // companies もビューに渡す
-    }
-    
+        
+        $companies = Company::all();
 
+        return view('product.index', compact('products', 'companies'));
+    }
 
     // 商品詳細表示
     public function show($id)
@@ -57,6 +61,7 @@ class ProductController extends Controller
                 'price' => $request->price,
                 'stock' => $request->stock,
                 'company_id' => $request->company_id,
+                'comment' => $request->comment, // コメントも保存する
                 'img_path' => null, // デフォルトでは null を設定
             ]);
 
@@ -96,8 +101,13 @@ class ProductController extends Controller
             $product->company_id = $request->input('company_id');
             $product->price = $request->input('price');
             $product->stock = $request->input('stock');
+            $product->comment = $request->input('comment'); // コメントも更新する
 
             if ($request->hasFile('image')) {
+                // 古い画像が存在する場合、削除する
+                if ($product->img_path) {
+                    \Storage::disk('public')->delete($product->img_path);
+                }
                 $path = $request->file('image')->store('images', 'public');
                 $product->img_path = $path;
             }
@@ -109,7 +119,7 @@ class ProductController extends Controller
             return redirect()->route('products.show', ['id' => $product->id])->with('success', '商品情報を更新しました。');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('products.edit', ['product' => $id])->withInput()->withErrors(['error' => '商品情報の更新中にエラーが発生しました。']);
+            return redirect()->route('products.edit', ['id' => $id])->withInput()->withErrors(['error' => '商品情報の更新中にエラーが発生しました。']);
         }
     }
 
@@ -120,6 +130,12 @@ class ProductController extends Controller
             DB::beginTransaction();
 
             $product = Product::findOrFail($id);
+
+            // 画像が存在する場合、削除する
+            if ($product->img_path) {
+                \Storage::disk('public')->delete($product->img_path);
+            }
+
             $product->delete();
 
             DB::commit();
