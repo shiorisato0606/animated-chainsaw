@@ -3,7 +3,7 @@
 @section('content')
     <div class="container">
         <h2>新規商品登録</h2>
-        <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('entities.storeProduct') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             {{-- 商品名 --}}
@@ -54,7 +54,7 @@
             <div class="form-group row mb-3">
                 <div class="col-sm-10 offset-sm-2">
                     <button type="submit" class="btn btn-primary">登録</button>
-                    <a href="{{ route('products.index') }}" class="btn btn-secondary ml-2">戻る</a>
+                    <a href="{{ route('entities.showProducts') }}" class="btn btn-secondary ml-2">戻る</a>
                 </div>
             </div>
         </form>
