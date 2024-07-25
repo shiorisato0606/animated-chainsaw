@@ -7,7 +7,7 @@
             <h1 class="card-header">商品編集</h1>
             <div class="card">
                 <div class="card-body">
-                    <form method="POST" action="{{ route('products.update', $product->id) }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('entities.products.update', ['id' => $product->id]) }}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -21,7 +21,7 @@
                         <div class="form-group row mb-4">
                             <label for="product_name" class="col-md-4 col-form-label text-md-right">商品名<span style="color: red;">※</span></label>
                             <div class="col-md-6">
-                                <input id="product_name" type="text" class="form-control @error('product_name') is-invalid @enderror" name="product_name" value="{{ old('product_name', $product->product_name) }}" required autocomplete="product_name" autofocus>
+                                <input id="product_name" type="text" class="form-control @error('product_name') is-invalid @enderror" name="product_name" value="{{ old('product_name', $product->product_name) }}" required>
                                 @error('product_name')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -50,7 +50,7 @@
                         <div class="form-group row mb-4">
                             <label for="price" class="col-md-4 col-form-label text-md-right">価格<span style="color: red;">※</span></label>
                             <div class="col-md-6">
-                                <input id="price" type="text" class="form-control @error('price') is-invalid @enderror" name="price" value="{{ old('price', $product->price) }}" required autocomplete="price">
+                                <input id="price" type="text" class="form-control @error('price') is-invalid @enderror" name="price" value="{{ old('price', $product->price) }}" required>
                                 @error('price')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -62,7 +62,7 @@
                         <div class="form-group row mb-4">
                             <label for="stock" class="col-md-4 col-form-label text-md-right">在庫数<span style="color: red;">※</span></label>
                             <div class="col-md-6">
-                                <input id="stock" type="text" class="form-control @error('stock') is-invalid @enderror" name="stock" value="{{ old('stock', $product->stock) }}" required autocomplete="stock">
+                                <input id="stock" type="text" class="form-control @error('stock') is-invalid @enderror" name="stock" value="{{ old('stock', $product->stock) }}" required>
                                 @error('stock')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -92,7 +92,6 @@
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
-
                                 @if ($product->img_path)
                                     <div class="mt-2">
                                         <img src="{{ asset('storage/' . $product->img_path) }}" alt="{{ $product->product_name }}" style="max-width: 100%; height: auto;">
@@ -103,12 +102,8 @@
 
                         <div class="form-group row mb-0">
                             <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    更新する
-                                </button>
-                                <a href="{{ route('products.show', ['id' => $product->id]) }}" class="btn btn-secondary">
-                                 戻る
-                                </a>
+                                <button type="submit" class="btn btn-primary">更新する</button>
+                                <a href="{{ route('entities.products.show', ['id' => $product->id]) }}" class="btn btn-secondary">戻る</a>
                             </div>
                         </div>
                     </form>
