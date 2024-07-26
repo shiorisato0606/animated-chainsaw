@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Company;
@@ -48,7 +47,7 @@ class EntityController extends Controller
             return redirect()->route('entities.showCompanies')->with('success', '会社情報を登録しました。');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()->withErrors(['error' => '会社情報の登録中にエラーが発生しました。']);
+            return back()->withInput()->withErrors('会社情報の登録中にエラーが発生しました。'); // カスタムエラーメッセージ
         }
     }
 
@@ -73,7 +72,7 @@ class EntityController extends Controller
             return redirect()->route('entities.showCompany', ['id' => $company->id])->with('success', '会社情報を更新しました。');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()->withErrors(['error' => '会社情報の更新中にエラーが発生しました。']);
+            return back()->withInput()->withErrors('会社情報の更新中にエラーが発生しました。'); // カスタムエラーメッセージ
         }
     }
 
@@ -91,7 +90,7 @@ class EntityController extends Controller
             return redirect()->route('entities.showCompanies')->with('success', '会社情報を削除しました。');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => '会社情報の削除中にエラーが発生しました。']);
+            return back()->withErrors('会社情報の削除中にエラーが発生しました。'); // カスタムエラーメッセージ
         }
     }
 
@@ -134,13 +133,12 @@ class EntityController extends Controller
         return view('product.index', compact('products', 'companies'));
     }
 
-// 商品詳細表示
-public function showProduct($id)
-{
-    $entity = Product::with('company')->findOrFail($id);
-    return view('product.show', compact('entity'));
-}
-
+    // 商品詳細表示
+    public function showProduct($id)
+    {
+        $entity = Product::with('company')->findOrFail($id);
+        return view('product.show', compact('entity'));
+    }
 
     // 商品情報登録ページ表示
     public function createProduct()
@@ -165,52 +163,49 @@ public function showProduct($id)
     
             DB::commit();
     
-            return redirect()->route('entities.products.index')->with('success', '商品を登録しました。');
+            return redirect()->route('entities.showProducts')->with('success', '商品を登録しました。');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('entities.products.create')->withInput()->withErrors(['error' => '商品の登録中にエラーが発生しました。']);
+            return redirect()->route('entities.createProduct')->withInput()->withErrors('商品情報の登録中にエラーが発生しました。'); // カスタムエラーメッセージ
         }
     }
-    
 
     // 商品情報編集ページ表示
-public function editProduct($id)
-{
-    $entity = Product::findOrFail($id);
-    $companies = Company::all();
-    return view('product.edit', compact('entity', 'companies'));
-}
-
-
+    public function editProduct($id)
+    {
+        $entity = Product::findOrFail($id);
+        $companies = Company::all();
+        return view('product.edit', compact('entity', 'companies'));
+    }
 
     // 商品情報更新処理
     public function updateProduct(EntityRequest $request, $id)
-{
-    try {
-        DB::beginTransaction();
+    {
+        try {
+            DB::beginTransaction();
 
-        $product = Product::findOrFail($id);
-        $product->update($request->only(['product_name', 'price', 'stock', 'company_id', 'comment']));
+            $product = Product::findOrFail($id);
+            $product->update($request->only(['product_name', 'price', 'stock', 'company_id', 'comment']));
 
-        if ($request->hasFile('image')) {
-            // 古い画像が存在する場合、削除する
-            if ($product->img_path) {
-                \Storage::disk('public')->delete($product->img_path);
+            if ($request->hasFile('image')) {
+                // 古い画像が存在する場合、削除する
+                if ($product->img_path) {
+                    \Storage::disk('public')->delete($product->img_path);
+                }
+                // 新しい画像を保存する
+                $path = $request->file('image')->store('images', 'public');
+                $product->img_path = $path;
+                $product->save(); // 画像パスを保存
             }
-            // 新しい画像を保存する
-            $path = $request->file('image')->store('images', 'public');
-            $product->img_path = $path;
-            $product->save(); // 画像パスを保存
+
+            DB::commit();
+
+            return redirect()->route('entities.showProduct', ['id' => $product->id])->with('success', '商品情報を更新しました。');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('entities.editProduct', ['id' => $id])->withInput()->withErrors('商品情報の更新中にエラーが発生しました。'); // カスタムエラーメッセージ
         }
-
-        DB::commit();
-
-        return redirect()->route('entities.products.show', ['id' => $product->id])->with('success', '商品情報を更新しました。');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return redirect()->route('entities.products.edit', ['id' => $id])->withInput()->withErrors(['error' => '商品情報の更新中にエラーが発生しました。']);
     }
-}
 
     // 商品情報削除処理
     public function destroyProduct($id)
@@ -231,7 +226,7 @@ public function editProduct($id)
             return redirect()->route('entities.showProducts')->with('success', '商品を削除しました。');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => '商品の削除中にエラーが発生しました。']);
+            return back()->withErrors('商品情報の削除中にエラーが発生しました。'); // カスタムエラーメッセージ
         }
     }
 }
