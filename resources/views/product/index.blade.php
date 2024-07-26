@@ -3,7 +3,8 @@
 @section('content')
 <div class="container">
     <h2>商品情報一覧</h2>
-    <form action="{{ route('entities.showProducts') }}" method="GET" class="mb-3">
+    <form action="{{ route('entities.products.store') }}" method="POST" enctype="multipart/form-data">
+        @csrf
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
@@ -40,7 +41,7 @@
                 <th>在庫</th>
                 <th>メーカー</th>
                 <th>
-                    <a href="{{ route('entities.createProduct') }}" class="btn btn-success">新規登録</a>
+                    <a href="{{ route('entities.products.create') }}" class="btn btn-success">新規登録</a>
                 </th>
             </tr>
         </thead>
@@ -61,8 +62,8 @@
                         <td>{{ $product->stock }}</td>
                         <td>{{ $product->company->company_name }}</td>
                         <td>
-                            <a href="{{ route('entities.showProduct', $product->id) }}" class="btn btn-info">詳細</a>
-                            <form action="{{ route('entities.destroyProduct', $product->id) }}" method="POST" style="display:inline;">
+                            <a href="{{ route('entities.products.show', $product->id) }}" class="btn btn-info">詳細</a>
+                            <form action="{{ route('entities.products.destroy', $product->id) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger">削除</button>

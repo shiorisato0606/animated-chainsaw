@@ -151,26 +151,27 @@ public function showProduct($id)
 
     // 商品情報登録処理
     public function storeProduct(EntityRequest $request)
-{
-    try {
-        DB::beginTransaction();
-
-        $product = Product::create($request->only(['product_name', 'price', 'stock', 'company_id', 'comment']));
-
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('images', 'public');
-            $product->img_path = $path;
-            $product->save(); // 画像パスを保存
+    {
+        try {
+            DB::beginTransaction();
+    
+            $product = Product::create($request->only(['product_name', 'price', 'stock', 'company_id', 'comment']));
+    
+            if ($request->hasFile('image')) {
+                $path = $request->file('image')->store('images', 'public');
+                $product->img_path = $path;
+                $product->save(); // 画像パスを保存
+            }
+    
+            DB::commit();
+    
+            return redirect()->route('entities.products.index')->with('success', '商品を登録しました。');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('entities.products.create')->withInput()->withErrors(['error' => '商品の登録中にエラーが発生しました。']);
         }
-
-        DB::commit();
-
-        return redirect()->route('entities.showProducts')->with('success', '商品を登録しました。');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return redirect()->route('entities.createProduct')->withInput()->withErrors(['error' => '商品の登録中にエラーが発生しました。']);
     }
-}
+    
 
     // 商品情報編集ページ表示
 public function editProduct($id)
@@ -204,10 +205,10 @@ public function editProduct($id)
 
         DB::commit();
 
-        return redirect()->route('entities.showProduct', ['id' => $product->id])->with('success', '商品情報を更新しました。');
+        return redirect()->route('entities.products.show', ['id' => $product->id])->with('success', '商品情報を更新しました。');
     } catch (\Exception $e) {
         DB::rollBack();
-        return redirect()->route('entities.editProduct', ['id' => $id])->withInput()->withErrors(['error' => '商品情報の更新中にエラーが発生しました。']);
+        return redirect()->route('entities.products.edit', ['id' => $id])->withInput()->withErrors(['error' => '商品情報の更新中にエラーが発生しました。']);
     }
 }
 

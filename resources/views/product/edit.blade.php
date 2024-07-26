@@ -7,7 +7,7 @@
             <h1 class="card-header">商品編集</h1>
             <div class="card">
                 <div class="card-body">
-                    <form method="POST" action="{{ route('entities.updateProduct', ['id' => $entity->id]) }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('entities.products.update', ['id' => $entity->id]) }}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -103,7 +103,7 @@
                         <div class="form-group row mb-0">
                             <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary">更新する</button>
-                                <a href="{{ route('entities.showProduct', ['id' => $entity->id]) }}" class="btn btn-secondary">戻る</a>
+                                <a href="{{ route('entities.products.show', ['id' => $entity->id]) }}" class="btn btn-secondary">戻る</a>
                             </div>
                         </div>
                     </form>

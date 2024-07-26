@@ -90,9 +90,9 @@
 
         <div class="buttons">
             @if(isset($entity))
-                <a href="{{ route('entities.editProduct', ['id' => $entity->id]) }}">編集</a>
+                <a href="{{ route('entities.products.edit', ['id' => $entity->id]) }}">編集</a>
             @endif
-            <a href="{{ route('entities.showProducts') }}">戻る</a>
+            <a href="{{ route('entities.products.index') }}">戻る</a>
         </div>
     </div>
 </body>
