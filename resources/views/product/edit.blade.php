@@ -75,7 +75,8 @@
         </div>
 
         <button type="submit" class="btn btn-primary">更新</button>
-        <a href="{{ route('entities.products.index') }}" class="btn btn-secondary ml-2">戻る</a>
+        <a href="{{ route('entities.products.show', $product->id) }}" class="btn btn-secondary ml-2">戻る</a>
+        </form>
     </form>
 </div>
 @endsection
