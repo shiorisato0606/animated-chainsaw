@@ -66,31 +66,31 @@
     </div>
     <div class="container">
         <div class="product-details">
-            @if(isset($entity))
-                <p><label>ID:</label>{{ $entity->id }}</p>
-                @if($entity->img_path)
+            @if(isset($product))
+                <p><label>ID:</label>{{ $product->id }}</p>
+                @if($product->img_path)
                     <div class="product-image">
                         <label>商品画像:</label>
-                        <img src="{{ asset('storage/' . $entity->img_path) }}" alt="{{ $entity->product_name }}" style="max-width: 100px; height: auto;">
+                        <img src="{{ asset('storage/' . $product->img_path) }}" alt="{{ $product->product_name }}" style="max-width: 100px; height: auto;">
                     </div>
                 @else
                     <p><label>商品画像:</label>No Image</p>
                 @endif
-                <p><label>商品名:</label>{{ $entity->product_name }}</p>
-                @if($entity->company)
-                    <p><label>メーカー名:</label>{{ $entity->company->company_name }}</p>
+                <p><label>商品名:</label>{{ $product->product_name }}</p>
+                @if($product->company)
+                    <p><label>メーカー名:</label>{{ $product->company->company_name }}</p>
                 @endif
-                <p><label>価格:</label>{{ $entity->price }}円</p>
-                <p><label>在庫数:</label>{{ $entity->stock }}個</p>
-                <p><label>コメント:</label>{{ $entity->comment }}</p>
+                <p><label>価格:</label>{{ $product->price }}円</p>
+                <p><label>在庫数:</label>{{ $product->stock }}個</p>
+                <p><label>コメント:</label>{{ $product->comment }}</p>
             @else
                 <p>商品情報が見つかりませんでした。</p>
             @endif
         </div>
 
         <div class="buttons">
-            @if(isset($entity))
-                <a href="{{ route('entities.products.edit', ['id' => $entity->id]) }}">編集</a>
+            @if(isset($product))
+                <a href="{{ route('entities.products.edit', ['id' => $product->id]) }}">編集</a>
             @endif
             <a href="{{ route('entities.products.index') }}">戻る</a>
         </div>

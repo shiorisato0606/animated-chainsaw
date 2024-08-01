@@ -2,114 +2,80 @@
 
 @section('content')
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <h1 class="card-header">商品編集</h1>
-            <div class="card">
-                <div class="card-body">
-                    <form method="POST" action="{{ route('entities.products.update', ['id' => $entity->id]) }}" enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
+    <h1>商品編集</h1>
 
-                        <div class="form-group row mb-4">
-                            <label for="id" class="col-md-4 col-form-label text-md-right">ID</label>
-                            <div class="col-md-6">
-                                <input id="id" type="text" class="form-control-plaintext" name="id" value="{{ $entity->id }}" readonly>
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-4">
-                            <label for="product_name" class="col-md-4 col-form-label text-md-right">商品名<span style="color: red;">※</span></label>
-                            <div class="col-md-6">
-                                <input id="product_name" type="text" class="form-control @error('product_name') is-invalid @enderror" name="product_name" value="{{ old('product_name', $entity->product_name) }}" required>
-                                @error('product_name')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-4">
-                            <label for="company_id" class="col-md-4 col-form-label text-md-right">メーカー名<span style="color: red;">※</span></label>
-                            <div class="col-md-6">
-                                <select id="company_id" class="form-control @error('company_id') is-invalid @enderror" name="company_id" required>
-                                    <option value="">選択してください</option>
-                                    @foreach($companies as $company)
-                                        <option value="{{ $company->id }}" {{ old('company_id', $entity->company_id) == $company->id ? 'selected' : '' }}>{{ $company->company_name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('company_id')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-4">
-                            <label for="price" class="col-md-4 col-form-label text-md-right">価格<span style="color: red;">※</span></label>
-                            <div class="col-md-6">
-                                <input id="price" type="text" class="form-control @error('price') is-invalid @enderror" name="price" value="{{ old('price', $entity->price) }}" required>
-                                @error('price')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-4">
-                            <label for="stock" class="col-md-4 col-form-label text-md-right">在庫数<span style="color: red;">※</span></label>
-                            <div class="col-md-6">
-                                <input id="stock" type="text" class="form-control @error('stock') is-invalid @enderror" name="stock" value="{{ old('stock', $entity->stock) }}" required>
-                                @error('stock')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-4">
-                            <label for="comment" class="col-md-4 col-form-label text-md-right">コメント</label>
-                            <div class="col-md-6">
-                                <textarea id="comment" class="form-control @error('comment') is-invalid @enderror" name="comment" rows="4">{{ old('comment', $entity->comment) }}</textarea>
-                                @error('comment')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-4">
-                            <label for="image" class="col-md-4 col-form-label text-md-right">商品画像</label>
-                            <div class="col-md-6">
-                                <input id="image" type="file" class="form-control-file @error('image') is-invalid @enderror" name="image">
-                                @error('image')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                                @if ($entity->img_path)
-                                    <div class="mt-2">
-                                        <img src="{{ asset('storage/' . $entity->img_path) }}" alt="{{ $entity->product_name }}" style="max-width: 100%; height: auto;">
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">更新する</button>
-                                <a href="{{ route('entities.products.show', ['id' => $entity->id]) }}" class="btn btn-secondary">戻る</a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
-    </div>
+    @endif
+
+    <form action="{{ route('entities.products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        @method('PUT')
+
+        <div class="form-group">
+            <label for="product_name">商品名</label>
+            <input type="text" name="product_name" id="product_name" class="form-control" value="{{ old('product_name', $product->product_name) }}">
+            @error('product_name')
+                <div class="alert alert-danger">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="form-group">
+    <label for="company_id">メーカー名</label>
+    <select name="company_id" id="company_id" class="form-control @error('company_id') is-invalid @enderror">
+        <option value="">メーカーを選択してください</option>
+        @foreach($companies as $company)
+            <option value="{{ $company->id }}" {{ old('company_id', $product->company_id) == $company->id ? 'selected' : '' }}>
+                {{ $company->company_name }}
+            </option>
+        @endforeach
+    </select>
+    @error('company_id')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+</div>
+
+
+        <div class="form-group">
+            <label for="price">価格</label>
+            <input type="number" name="price" id="price" class="form-control" value="{{ old('price', $product->price) }}">
+            @error('price')
+                <div class="alert alert-danger">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="form-group">
+            <label for="stock">在庫数</label>
+            <input type="number" name="stock" id="stock" class="form-control" value="{{ old('stock', $product->stock) }}">
+            @error('stock')
+                <div class="alert alert-danger">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="form-group">
+            <label for="comment">コメント</label>
+            <textarea name="comment" id="comment" class="form-control">{{ old('comment', $product->comment) }}</textarea>
+            @error('comment')
+                <div class="alert alert-danger">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="form-group">
+            <label for="image">画像</label>
+            <input type="file" name="image" id="image" class="form-control">
+            @error('image')
+                <div class="alert alert-danger">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <button type="submit" class="btn btn-primary">更新</button>
+        <a href="{{ route('entities.products.index') }}" class="btn btn-secondary ml-2">戻る</a>
+    </form>
 </div>
 @endsection

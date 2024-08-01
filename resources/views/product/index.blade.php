@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <h2>商品情報一覧</h2>
-    <form action="{{ route('entities.products.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('entities.products.index') }}" method="GET">
         @csrf
         <div class="row">
             <div class="col-md-6">
@@ -18,7 +18,9 @@
                             <option value="">メーカー名</option>
                             @isset($companies)
                                 @foreach($companies as $company)
-                                    <option value="{{ $company->id }}" {{ request('company') == $company->id ? 'selected' : '' }}>{{ $company->company_name }}</option>
+                                    <option value="{{ $company->id }}" {{ request('company') == $company->id ? 'selected' : '' }}>
+                                        {{ $company->company_name }} <!-- ここを修正 -->
+                                    </option>
                                 @endforeach
                             @endisset
                         </select>

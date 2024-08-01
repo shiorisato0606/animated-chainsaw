@@ -9,8 +9,8 @@ return new class extends Migration
     public function up()
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->bigIncrements('id'); // bigIncrements を使用することで、自動インクリメントの big integer 型の主キーが定義されます
-            $table->unsignedBigInteger('company_id'); // unsignedBigInteger を使用して外部キーを参照するカラムを定義します
+            $table->bigIncrements('id'); 
+            $table->unsignedBigInteger('company_id'); 
             $table->string('product_name');
             $table->integer('price');
             $table->integer('stock');
