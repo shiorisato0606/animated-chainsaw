@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Product;
@@ -15,97 +14,11 @@ class EntityController extends Controller
         $this->middleware('auth');
     }
 
-    // 会社関連メソッド
-    public function showCompanies()
-    {
-        $companies = Company::all();
-        return view('company.index', compact('companies'));
-    }
-
-    public function showCompany($id)
-    {
-        $company = Company::findOrFail($id);
-        return view('company.show', compact('company'));
-    }
-
-    public function createCompany()
-    {
-        return view('company.create');
-    }
-
-    public function storeCompany(EntityRequest $request)
-    {
-        try {
-            DB::beginTransaction();
-
-            $company = new Company([
-                'name' => $request->name,
-                'address' => $request->address,
-                'representative' => $request->representative,
-            ]);
-
-            $company->save();
-
-            DB::commit();
-
-            return redirect()->route('entities.companies.index')->with('success', '会社情報を登録しました。');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withInput()->withErrors(['error' => '会社情報の登録中にエラーが発生しました。']);
-        }
-    }
-
-    public function editCompany($id)
-    {
-        $company = Company::findOrFail($id);
-        return view('company.edit', compact('company'));
-    }
-
-    public function updateCompany(EntityRequest $request, $id)
-    {
-        try {
-            DB::beginTransaction();
-
-            $company = Company::findOrFail($id);
-
-            $company->name = $request->name;
-            $company->address = $request->address;
-            $company->representative = $request->representative;
-
-            $company->save();
-
-            DB::commit();
-
-            return redirect()->route('entities.companies.show', ['id' => $company->id])->with('success', '会社情報を更新しました。');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withInput()->withErrors(['error' => '会社情報の更新中にエラーが発生しました。']);
-        }
-    }
-
-    public function destroyCompany($id)
-    {
-        try {
-            DB::beginTransaction();
-
-            $company = Company::findOrFail($id);
-            $company->delete();
-
-            DB::commit();
-
-            return redirect()->route('entities.companies.index')->with('success', '会社情報を削除しました。');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withErrors(['error' => '会社情報の削除中にエラーが発生しました。']);
-        }
-    }
-
-    // 商品関連メソッド
-    public function showProducts(Request $request)
+    // 商品一覧表示 (index)
+    public function index(Request $request)
     {
         $search = $request->input('search');
         $company = $request->input('company');
-        
         $products = Product::with('company')
             ->when($search, function($query, $search) {
                 return $query->where('product_name', 'like', "%{$search}%");
@@ -119,22 +32,31 @@ class EntityController extends Controller
     
         return view('product.index', compact('products', 'companies'));
     }
-    
 
-
-    public function showProduct($id)
+    // 商品詳細表示 (show)
+    public function show($id)
     {
         $product = Product::with('company')->findOrFail($id);
         return view('product.show', compact('product'));
     }
 
-    public function createProduct()
+    // 商品作成 (create)
+    public function create()
     {
         $companies = Company::all();
         return view('product.create', compact('companies'));
     }
 
-    public function storeProduct(EntityRequest $request)
+    // 商品編集 (edit)
+    public function edit($id)
+    {
+        $product = Product::findOrFail($id);
+        $companies = Company::all();
+        return view('product.edit', compact('product', 'companies'));
+    }
+
+    // 商品登録 (store)
+    public function store(EntityRequest $request)
     {
         try {
             DB::beginTransaction();
@@ -164,14 +86,8 @@ class EntityController extends Controller
         }
     }
 
-    public function editProduct($id)
-    {
-        $product = Product::findOrFail($id);
-        $companies = Company::all();
-        return view('product.edit', compact('product', 'companies'));
-    }
-
-    public function updateProduct(EntityRequest $request, $id)
+    // 商品更新 (update)
+    public function update(EntityRequest $request, $id)
     {
         try {
             DB::beginTransaction();
@@ -203,7 +119,8 @@ class EntityController extends Controller
         }
     }
 
-    public function destroyProduct($id)
+    // 商品削除 (destroy)
+    public function destroy($id)
     {
         try {
             DB::beginTransaction();
