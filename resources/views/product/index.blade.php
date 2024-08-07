@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h2>商品情報一覧</h2>
+    <h2>商品情報一覧画面</h2>
     <form action="{{ route('entities.products.index') }}" method="GET">
         @csrf
         <div class="row">

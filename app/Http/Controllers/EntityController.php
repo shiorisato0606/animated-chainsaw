@@ -86,7 +86,7 @@ class EntityController extends Controller
         }
     }
 
-    // 商品更新 (update)
+    // 商品更新 (編集画面の更新update)
     public function update(EntityRequest $request, $id)
     {
         try {
@@ -119,7 +119,7 @@ class EntityController extends Controller
         }
     }
 
-    // 商品削除 (destroy)
+    // 商品削除 (商品一覧画面の削除 destroy)
     public function destroy($id)
     {
         try {
