@@ -18,10 +18,10 @@ Route::middleware('auth')->group(function () {
     Route::prefix('products')->group(function () {
         // 表示用
         Route::get('/', [EntityController::class, 'index'])->name('entities.products.index'); // 商品一覧表示
+        Route::get('create', [EntityController::class, 'create'])->name('entities.products.create'); // 新規商品登録画面
         Route::get('{id}', [EntityController::class, 'show'])->name('entities.products.show'); // 商品詳細表示
 
         // 編集用
-        Route::get('create', [EntityController::class, 'create'])->name('entities.products.create'); // 新規商品登録画面
         Route::get('{id}/edit', [EntityController::class, 'edit'])->name('entities.products.edit'); // 商品編集画面
 
         // 更新用

@@ -4,6 +4,7 @@
 <div class="container">
     <h2>新規商品登録画面</h2>
     <form action="{{ route('entities.products.store') }}" method="POST" enctype="multipart/form-data">
+        
         @csrf
 
         <div class="form-group row mb-3">

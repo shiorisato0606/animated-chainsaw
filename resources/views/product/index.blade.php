@@ -43,7 +43,7 @@
                 <th>在庫</th>
                 <th>メーカー</th>
                 <th>
-                <a href="{{ route('entities.products.create') }}" class="btn btn-success">新規登録</a>
+                    <a href="{{ route('entities.products.create') }}" class="btn btn-success">新規登録</a>
 
 
                 </th>
