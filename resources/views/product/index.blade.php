@@ -19,7 +19,7 @@
                             @isset($companies)
                                 @foreach($companies as $company)
                                     <option value="{{ $company->id }}" {{ request('company') == $company->id ? 'selected' : '' }}>
-                                        {{ $company->company_name }} <!-- ここを修正 -->
+                                        {{ $company->company_name }} 
                                     </option>
                                 @endforeach
                             @endisset
@@ -43,7 +43,9 @@
                 <th>在庫</th>
                 <th>メーカー</th>
                 <th>
-                    <a href="{{ route('entities.products.create') }}" class="btn btn-success">新規登録</a>
+                <a href="{{ route('entities.products.create') }}" class="btn btn-success">新規登録</a>
+
+
                 </th>
             </tr>
         </thead>
