@@ -16,8 +16,9 @@ Route::middleware('auth')->group(function () {
 
     // 商品関連ルート
     Route::prefix('products')->group(function () {
-        // 表示用
-        Route::get('/', [EntityController::class, 'index'])->name('entities.products.index'); // 商品一覧表示
+       
+Route::get('/products', [EntityController::class, 'index'])->name('entities.products.index');
+
         Route::get('create', [EntityController::class, 'create'])->name('entities.products.create'); // 新規商品登録画面
         Route::get('{id}', [EntityController::class, 'show'])->name('entities.products.show'); // 商品詳細表示
 

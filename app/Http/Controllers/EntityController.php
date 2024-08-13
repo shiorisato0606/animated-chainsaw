@@ -1,11 +1,11 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Http\Requests\EntityRequest;
 
 class EntityController extends Controller
 {
@@ -19,6 +19,14 @@ class EntityController extends Controller
     {
         $search = $request->input('search');
         $company = $request->input('company');
+        $minPrice = $request->input('min_price');
+        $maxPrice = $request->input('max_price');
+        $minStock = $request->input('min_stock');
+        $maxStock = $request->input('max_stock');
+        $sortBy = $request->input('sort_by') ?? 'id';
+        $order = $request->input('order') ?? 'desc';
+
+        // 商品データの取得
         $products = Product::with('company')
             ->when($search, function($query, $search) {
                 return $query->where('product_name', 'like', "%{$search}%");
@@ -26,10 +34,27 @@ class EntityController extends Controller
             ->when($company, function($query, $company) {
                 return $query->where('company_id', $company);
             })
+            ->when($minPrice, function($query, $minPrice) {
+                return $query->where('price', '>=', $minPrice);
+            })
+            ->when($maxPrice, function($query, $maxPrice) {
+                return $query->where('price', '<=', $maxPrice);
+            })
+            ->when($minStock, function($query, $minStock) {
+                return $query->where('stock', '>=', $minStock);
+            })
+            ->when($maxStock, function($query, $maxStock) {
+                return $query->where('stock', '<=', $maxStock);
+            })
+            ->orderBy($sortBy, $order)
             ->get();
-        
+
+        // メーカーリストの取得
         $companies = Company::all();
-    
+        if ($request->ajax()) {
+            return view('product.partials.product_list', compact('products'))->render();
+        }
+
         return view('product.index', compact('products', 'companies'));
     }
 
@@ -56,7 +81,7 @@ class EntityController extends Controller
     }
 
     // 商品登録 (store)
-    public function store(EntityRequest $request)
+    public function store(Request $request)
     {
         try {
             DB::beginTransaction();
@@ -86,8 +111,8 @@ class EntityController extends Controller
         }
     }
 
-    // 商品更新 (編集画面の更新update)
-    public function update(EntityRequest $request, $id)
+    // 商品更新 (update)
+    public function update(Request $request, $id)
     {
         try {
             DB::beginTransaction();
@@ -119,7 +144,7 @@ class EntityController extends Controller
         }
     }
 
-    // 商品削除 (商品一覧画面の削除 destroy)
+    // 商品削除 (destroy)
     public function destroy($id)
     {
         try {
@@ -135,10 +160,10 @@ class EntityController extends Controller
 
             DB::commit();
 
-            return redirect()->route('entities.products.index')->with('success', '商品を削除しました。');
+            return response()->json(['success' => '商品を削除しました。']);
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => '商品の削除中にエラーが発生しました。']);
+            return response()->json(['error' => '商品の削除中にエラーが発生しました。'], 500);
         }
     }
 }
