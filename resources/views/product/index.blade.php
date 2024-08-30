@@ -94,7 +94,7 @@
 </div>
 
 <!-- jQuery and Ajax for Search, Sort, and Delete -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
 $(document).ready(function() {
     // 非同期検索
@@ -120,7 +120,7 @@ $(document).ready(function() {
             url: "{{ route('entities.products.index') }}?" + formData,
             type: "GET",
             success: function(data) {
-                $('#productList').html(data);
+                $('#productList').html(data); // 正しい方法で内容を置き換え
             }
         });
         $(this).data('order', order === 'asc' ? 'desc' : 'asc');
