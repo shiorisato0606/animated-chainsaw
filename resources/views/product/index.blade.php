@@ -80,6 +80,8 @@
                     <td>
                         <a href="{{ route('entities.products.show', $product->id) }}" class="btn btn-info">詳細</a>
                         <button class="btn btn-danger delete" data-url="{{ route('entities.products.destroy', $product->id) }}">削除</button>
+                        <!-- 購入ボタンを追加 -->
+                        <button class="btn btn-primary purchase-button" data-product-id="{{ $product->id }}">購入</button>
                     </td>
                 </tr>
             @endforeach
@@ -87,7 +89,7 @@
     </table>
 </div>
 
-<!-- jQuery and Ajax for Search, Sort, and Delete -->
+<!-- jQuery and Ajax for Search, Sort, Delete, and Purchase -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
 $(document).ready(function() {
@@ -139,6 +141,33 @@ $(document).ready(function() {
             }
         });
     });
+
+    // 購入ボタンの処理
+$('#productList').on('click', '.purchase-button', function(event) {
+    event.preventDefault();
+    let productId = $(this).data('product-id');
+    $.ajax({
+        url: '/api/purchase',
+        type: 'POST',
+        data: {
+            product_id: productId,
+            quantity: 1 // 必要に応じて数量を設定
+        },
+        success: function(response) {
+            if (response.success) {
+                alert('購入が完了しました');
+                location.reload(); // ページをリロードして最新の状態にする
+            } else {
+                alert('エラー: ' + response.error);
+            }
+        },
+        error: function(xhr) {
+            console.error(xhr.responseText);
+            alert('エラーが発生しました');
+        }
+    });
+});
+
 });
 </script>
 @endsection
