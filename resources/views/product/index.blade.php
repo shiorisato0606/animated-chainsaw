@@ -63,32 +63,26 @@
             </tr>
         </thead>
         <tbody id="productList">
-            @isset($products)
-                @foreach($products as $product)
-                    <tr>
-                        <td>{{ $product->id }}</td>
-                        <td>
-                            @if($product->img_path)
-                                <img src="{{ asset('storage/' . $product->img_path) }}" alt="商品画像" style="width: 100px; height: auto;">
-                            @else
-                                <span>No Image</span>
-                            @endif
-                        </td>
-                        <td>{{ $product->product_name }}</td>
-                        <td>{{ $product->price }}</td>
-                        <td>{{ $product->stock }}</td>
-                        <td>{{ $product->company->company_name }}</td>
-                        <td>
-                            <a href="{{ route('entities.products.show', $product->id) }}" class="btn btn-info">詳細</a>
-                            <button class="btn btn-danger delete" data-url="{{ route('entities.products.destroy', $product->id) }}">削除</button>
-                        </td>
-                    </tr>
-                @endforeach
-            @else
+            @foreach($products as $product)
                 <tr>
-                    <td colspan="7">商品が見つかりませんでした</td>
+                    <td>{{ $product->id }}</td>
+                    <td>
+                        @if($product->img_path)
+                            <img src="{{ asset('storage/' . $product->img_path) }}" alt="商品画像" style="width: 100px; height: auto;">
+                        @else
+                            <span>No Image</span>
+                        @endif
+                    </td>
+                    <td>{{ $product->product_name }}</td>
+                    <td>{{ $product->price }}</td>
+                    <td>{{ $product->stock }}</td>
+                    <td>{{ $product->company->company_name }}</td>
+                    <td>
+                        <a href="{{ route('entities.products.show', $product->id) }}" class="btn btn-info">詳細</a>
+                        <button class="btn btn-danger delete" data-url="{{ route('entities.products.destroy', $product->id) }}">削除</button>
+                    </td>
                 </tr>
-            @endisset
+            @endforeach
         </tbody>
     </table>
 </div>
@@ -104,8 +98,8 @@ $(document).ready(function() {
         $.ajax({
             url: "{{ route('entities.products.index') }}?" + formData,
             type: "GET",
-            success: function(data) {
-                $('#productList').html(data);
+            success: function(response) {
+                $('#productList').html($(response.html).find('#productList').html()); // 商品リストのみ更新
             }
         });
     });
@@ -119,26 +113,30 @@ $(document).ready(function() {
         $.ajax({
             url: "{{ route('entities.products.index') }}?" + formData,
             type: "GET",
-            success: function(data) {
-                $('#productList').html(data); // 正しい方法で内容を置き換え
+            success: function(response) {
+                $('#productList').html($(response.html).find('#productList').html()); // 商品リストのみ更新
             }
         });
         $(this).data('order', order === 'asc' ? 'desc' : 'asc');
     });
 
     // 非同期削除
-    $(document).on('click', '.delete', function(event) {
+    $('#productList').on('click', '.delete', function(event) {
         event.preventDefault();
-        let url = $(this).data('url');
+        if (!confirm('本当に削除しますか？')) {
+            return;
+        }
+        let deleteUrl = $(this).data('url');
         $.ajax({
-            url: url,
-            type: "DELETE",
+            url: deleteUrl,
+            type: 'DELETE',
             data: {
                 _token: "{{ csrf_token() }}"
             },
             success: function(response) {
-                $(this).closest('tr').remove();
-            }.bind(this)
+                alert(response.success);
+                location.reload();
+            }
         });
     });
 });
