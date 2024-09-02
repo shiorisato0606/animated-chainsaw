@@ -142,12 +142,13 @@ $(document).ready(function() {
         });
     });
 
-    // 購入ボタンの処理
+   // 購入ボタンの処理
 $('#productList').on('click', '.purchase-button', function(event) {
     event.preventDefault();
     let productId = $(this).data('product-id');
+    let $stockCell = $(this).closest('tr').find('td').eq(4); // 在庫のセルを取得
     $.ajax({
-        url: '/api/purchase',
+        url: '{{ url("/api/purchase") }}',  // ここを修正
         type: 'POST',
         data: {
             product_id: productId,
@@ -156,7 +157,14 @@ $('#productList').on('click', '.purchase-button', function(event) {
         success: function(response) {
             if (response.success) {
                 alert('購入が完了しました');
-                location.reload(); // ページをリロードして最新の状態にする
+                // 在庫数の更新
+                let newStock = parseInt($stockCell.text()) - 1; // 在庫数を減らす
+                $stockCell.text(newStock);
+
+                // 在庫が0になったら、購入ボタンを無効にする
+                if (newStock <= 0) {
+                    $stockCell.closest('tr').find('.purchase-button').prop('disabled', true);
+                }
             } else {
                 alert('エラー: ' + response.error);
             }

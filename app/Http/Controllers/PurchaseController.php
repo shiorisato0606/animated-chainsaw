@@ -1,9 +1,10 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
-use App\Models\Sale;
+use App\Models\Sale; // 修正
 use Illuminate\Support\Facades\DB;
 
 class PurchaseController extends Controller
@@ -27,7 +28,7 @@ class PurchaseController extends Controller
             }
 
             // salesテーブルにレコードを追加
-            Sales::create([
+            Sale::create([ // 修正
                 'product_id' => $product->id,
                 'quantity' => $validated['quantity'],
                 'total_price' => $product->price * $validated['quantity'],
@@ -42,7 +43,7 @@ class PurchaseController extends Controller
             return response()->json(['success' => '購入処理が完了しました。'], 200);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => '購入処理中にエラーが発生しました。'], 500);
+            return response()->json(['error' => '購入処理中にエラーが発生しました。詳細: ' . $e->getMessage()], 500);
         }
     }
 }
