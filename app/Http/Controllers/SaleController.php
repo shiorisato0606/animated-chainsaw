@@ -12,25 +12,21 @@ class SaleController extends Controller
     {
         $validatedData = $request->validate([
             'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
         ]);
 
         $product = Product::find($validatedData['product_id']);
 
-        if ($product->stock < $validatedData['quantity']) {
+        if ($product->stock < 1) {
             return response()->json(['success' => false, 'error' => '在庫が不足しています'], 400);
         }
 
-        DB::transaction(function () use ($product, $validatedData) {
-            // salesテーブルにデータを追加
+        DB::transaction(function () use ($product) {
             Sale::create([
-                'product_id' => $validatedData['product_id'],
-                'quantity' => $validatedData['quantity'],
-                'total_price' => $product->price * $validatedData['quantity'],
+                'product_id' => $product->id,
             ]);
 
             // 在庫を減算
-            $product->stock -= $validatedData['quantity'];
+            $product->stock -= 1;
             $product->save();
         });
 
