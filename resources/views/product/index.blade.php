@@ -75,12 +75,11 @@
                     </td>
                     <td>{{ $product->product_name }}</td>
                     <td>{{ $product->price }}</td>
-                    <td>{{ $product->stock }}</td>
+                    <td class="stock">{{ $product->stock }}</td>
                     <td>{{ $product->company->company_name }}</td>
                     <td>
                         <a href="{{ route('entities.products.show', $product->id) }}" class="btn btn-info">詳細</a>
                         <button class="btn btn-danger delete" data-url="{{ route('entities.products.destroy', $product->id) }}">削除</button>
-                        <!-- 購入ボタンを追加 -->
                         <button class="btn btn-primary purchase-button" data-product-id="{{ $product->id }}">購入</button>
                     </td>
                 </tr>
@@ -89,11 +88,15 @@
     </table>
 </div>
 
-<!-- jQuery and Ajax for Search, Sort, Delete, and Purchase -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
 $(document).ready(function() {
-    // 非同期検索
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
     $('#searchForm').on('submit', function(event) {
         event.preventDefault();
         let formData = $(this).serialize();
@@ -101,12 +104,11 @@ $(document).ready(function() {
             url: "{{ route('entities.products.index') }}?" + formData,
             type: "GET",
             success: function(response) {
-                $('#productList').html($(response.html).find('#productList').html()); // 商品リストのみ更新
+                $('#productList').html($(response.html).find('#productList').html());
             }
         });
     });
 
-    // ソート
     $('.sort').on('click', function(event) {
         event.preventDefault();
         let column = $(this).data('column');
@@ -116,13 +118,12 @@ $(document).ready(function() {
             url: "{{ route('entities.products.index') }}?" + formData,
             type: "GET",
             success: function(response) {
-                $('#productList').html($(response.html).find('#productList').html()); // 商品リストのみ更新
+                $('#productList').html($(response.html).find('#productList').html());
             }
         });
         $(this).data('order', order === 'asc' ? 'desc' : 'asc');
     });
 
-    // 非同期削除
     $('#productList').on('click', '.delete', function(event) {
         event.preventDefault();
         if (!confirm('本当に削除しますか？')) {
@@ -137,47 +138,41 @@ $(document).ready(function() {
             },
             success: function(response) {
                 alert(response.success);
-                location.reload();
+                $(event.target).closest('tr').remove();
             }
         });
     });
 
-// 購入ボタンの処理
-$('#productList').on('click', '.purchase-button', function(event) {
-    event.preventDefault();
-    let productId = $(this).data('product-id');
-    let $stockCell = $(this).closest('tr').find('td').eq(4); // 在庫のセルを取得
-    $.ajax({
-        url: '{{ url("/api/purchase") }}',
-        type: 'POST',
-        data: {
-            product_id: productId,
-            quantity: 1, // 必要に応じて数量を設定
-            _token: "{{ csrf_token() }}" // CSRFトークンを追加
-        },
-        success: function(response) {
-            if (response.success) {
-                alert('購入が完了しました');
-                // 在庫数の更新
-                let newStock = parseInt($stockCell.text()) - 1; // 在庫数を減らす
-                $stockCell.text(newStock);
+    $('#productList').on('click', '.purchase-button', function(event) {
+        event.preventDefault();
+        let button = $(this);
+        let productId = button.data('product-id');
+        $.ajax({
+            url: "{{ url('/api/purchase') }}",
+            type: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                product_id: productId
+            },
+            success: function(response) {
+                if (response.success) {
+                    let row = button.closest('tr');
+                    let stockCell = row.find('.stock');
+                    let newStock = parseInt(stockCell.text()) - 1;
+                    if (newStock < 0) newStock = 0;
+                    stockCell.text(newStock);
 
-                // 在庫が0になったら、購入ボタンを無効にする
-                if (newStock <= 0) {
-                    $stockCell.closest('tr').find('.purchase-button').prop('disabled', true);
+                    alert('購入が成功しました');
+                } else {
+                    alert('購入に失敗しました');
                 }
-            } else {
-                alert('エラー: ' + response.error);
+            },
+            error: function(xhr) {
+                let errorMessage = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : '購入に失敗しました';
+                alert(errorMessage);
             }
-        },
-        error: function(xhr) {
-            console.error(xhr.responseText);
-            alert('エラーが発生しました');
-        }
+        });
     });
-});
-
-
 });
 </script>
 @endsection

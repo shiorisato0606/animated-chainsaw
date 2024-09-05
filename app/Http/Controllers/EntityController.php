@@ -17,49 +17,48 @@ class EntityController extends Controller
 
     // 商品一覧表示 (index)
     public function index(Request $request)
-    {
-        $search = $request->input('search');
-        $company = $request->input('company');
-        $minPrice = $request->input('min_price');
-        $maxPrice = $request->input('max_price');
-        $minStock = $request->input('min_stock');
-        $maxStock = $request->input('max_stock');
-        $sortBy = $request->input('sort_by') ?? 'id';
-        $order = $request->input('order') ?? 'desc';
+{
+    $search = $request->input('search');
+    $company = $request->input('company');
+    $minPrice = $request->input('min_price');
+    $maxPrice = $request->input('max_price');
+    $minStock = $request->input('min_stock');
+    $maxStock = $request->input('max_stock');
+    $sortBy = $request->input('sort_by') ?? 'id';
+    $order = $request->input('order') ?? 'desc';
 
-        // 商品データの取得
-        $products = Product::with('company')
-            ->when($search, function($query, $search) {
-                return $query->where('product_name', 'like', "%{$search}%");
-            })
-            ->when($company, function($query, $company) {
-                return $query->where('company_id', $company);
-            })
-            ->when($minPrice, function($query, $minPrice) {
-                return $query->where('price', '>=', $minPrice);
-            })
-            ->when($maxPrice, function($query, $maxPrice) {
-                return $query->where('price', '<=', $maxPrice);
-            })
-            ->when($minStock, function($query, $minStock) {
-                return $query->where('stock', '>=', $minStock);
-            })
-            ->when($maxStock, function($query, $maxStock) {
-                return $query->where('stock', '<=', $maxStock);
-            })
-            ->orderBy($sortBy, $order)
-            ->get();
+    // 商品データの取得
+    $products = Product::with('company')
+        ->when($search, function($query, $search) {
+            return $query->where('product_name', 'like', "%{$search}%");
+        })
+        ->when($company, function($query, $company) {
+            return $query->where('company_id', $company);
+        })
+        ->when($minPrice, function($query, $minPrice) {
+            return $query->where('price', '>=', $minPrice);
+        })
+        ->when($maxPrice, function($query, $maxPrice) {
+            return $query->where('price', '<=', $maxPrice);
+        })
+        ->when($minStock, function($query, $minStock) {
+            return $query->where('stock', '>=', $minStock);
+        })
+        ->when($maxStock, function($query, $maxStock) {
+            return $query->where('stock', '<=', $maxStock);
+        })
+        ->orderBy($sortBy, $order)
+        ->get();
 
-        // メーカーリストの取得
-        $companies = Company::all();
+    // メーカーリストの取得
+    $companies = Company::all();
 
-        if ($request->ajax()) {
-            $html = view('product.index', ['products' => $products])->renderSections()['content'];
-            return response()->json(['html' => $html]);
-        }
-
-        return view('product.index', compact('products', 'companies'));
+    if ($request->ajax()) {
+        $html = view('product.index', ['products' => $products, 'companies' => $companies])->renderSections()['content'];
+        return response()->json(['html' => $html]);
     }
+    return view('product.index', compact('products', 'companies'));
+}
 
     // 商品詳細表示 (show)
     public function show($id)
@@ -86,20 +85,27 @@ class EntityController extends Controller
     // 商品新規登録処理 (store)
     public function store(Request $request)
     {
-        // 商品の登録処理
         $validated = $request->validate([
             'product_name' => 'required|string|max:255',
             'company_id' => 'required|exists:companies,id',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|numeric|min:0',
             'comment' => 'nullable|string|max:1000',
-            'img_path' => 'nullable|image|max:1024',
+            'image' => 'nullable|image|max:1024',
         ]);
-
-        $product = Product::create($validated);
-
+        
+        if ($request->hasFile('image')) {
+            $imgPath = $request->file('image')->store('images', 'public');
+            $validated['img_path'] = $imgPath;
+        }
+    
+        Product::create($validated);
+    
         return redirect()->route('entities.products.index')->with('success', '商品が登録されました');
     }
+    
+
+
 
         // 商品更新 (update)
         public function update(Request $request, $id)
